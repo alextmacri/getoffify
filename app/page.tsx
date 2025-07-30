@@ -30,7 +30,7 @@ export default function Home() {
         </Link>
       </div>
 
-      <div className="flex flex-col text-lg text-default-600 items-center text-center max-w-8/12 gap-4">
+      <div className="flex flex-col text-lg text-default-600 items-center text-center max-w-3/4 gap-4">
         <span>
           Securely sign in with your Spotify account, then select the songs, playlists, albums, and artists you want to transfer.
           Getoffify will create a personalized checklist with everything you need to finally make the switch.
