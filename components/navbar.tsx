@@ -26,7 +26,7 @@ export const Navbar = () => {
       </NavbarContent>
 
       <NavbarContent className="basis-1 pl-4" justify="end">
-        <Link isExternal aria-label="Github" href="https://github.com/alextmacri/getoffify/">
+        <Link isExternal aria-label="Github" href={siteConfig.links.github}>
           <GithubIcon className="text-default-500" />
         </Link>
         <ThemeSwitch />
