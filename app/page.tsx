@@ -9,12 +9,10 @@ export default function Home() {
     <section className="flex flex-col items-center justify-center gap-20 py-10">
       <div className="inline-block max-w-xl text-center justify-center">
         <span className={title()}>Making the switch from&nbsp;</span>
-        <br />
         <span className={title({ color: "green" })}>Spotify&nbsp;</span>
         <span className={title()}>to&nbsp;</span>
         <span className={title({ color: "pink" })}>Apple Music&nbsp;</span>
-        <br />
-        <span className={title()}>is now little bit easier.&nbsp;</span>
+        <span className={title()}>is now a little bit easier.&nbsp;</span>
       </div>
 
       <div className="flex gap-3">
@@ -32,11 +30,14 @@ export default function Home() {
         </Link>
       </div>
 
-      <div className="flex flex-col text-lg text-default-600 items-center text-center max-w-8/12 gap-2">
-
+      <div className="flex flex-col text-lg text-default-600 items-center text-center max-w-8/12 gap-4">
         <span>
           Securely sign in with your Spotify account, then select the songs, playlists, albums, and artists you want to transfer.
           Getoffify will create a personalized checklist with everything you need to finally make the switch.
+        </span>
+        <span className="text-sm opacity-60">
+          Note: This is an open source, static web app. Your Spotify credentials and data are never sent anywhere.
+          Don't trust me? Click the GitHub button in the navbar to see for yourself.
         </span>
       </div>
     </section>
