@@ -1,55 +1,43 @@
 import { Link } from "@heroui/link";
-import { Snippet } from "@heroui/snippet";
-import { Code } from "@heroui/code";
 import { button as buttonStyles } from "@heroui/theme";
 
 import { siteConfig } from "@/config/site";
 import { title, subtitle } from "@/components/primitives";
-import { GithubIcon } from "@/components/icons";
 
 export default function Home() {
   return (
-    <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
+    <section className="flex flex-col items-center justify-center gap-20 py-10">
       <div className="inline-block max-w-xl text-center justify-center">
-        <span className={title()}>Make&nbsp;</span>
-        <span className={title({ color: "violet" })}>beautiful&nbsp;</span>
+        <span className={title()}>Making the switch from&nbsp;</span>
         <br />
-        <span className={title()}>
-          websites regardless of your design experience.
-        </span>
-        <div className={subtitle({ class: "mt-4" })}>
-          Beautiful, fast and modern React UI library.
-        </div>
+        <span className={title({ color: "green" })}>Spotify&nbsp;</span>
+        <span className={title()}>to&nbsp;</span>
+        <span className={title({ color: "pink" })}>Apple Music&nbsp;</span>
+        <br />
+        <span className={title()}>is now little bit easier.&nbsp;</span>
       </div>
 
       <div className="flex gap-3">
         <Link
           isExternal
           className={buttonStyles({
-            color: "primary",
+            color: "success",
             radius: "full",
             variant: "shadow",
+            size: "lg",
           })}
-          href={siteConfig.links.docs}
+          href="/"
         >
-          Documentation
-        </Link>
-        <Link
-          isExternal
-          className={buttonStyles({ variant: "bordered", radius: "full" })}
-          href={siteConfig.links.github}
-        >
-          <GithubIcon size={20} />
-          GitHub
+          Sign in with Spotify
         </Link>
       </div>
 
-      <div className="mt-8">
-        <Snippet hideCopyButton hideSymbol variant="bordered">
-          <span>
-            Get started by editing <Code color="primary">app/page.tsx</Code>
-          </span>
-        </Snippet>
+      <div className="flex flex-col text-lg text-default-600 items-center text-center max-w-8/12 gap-2">
+
+        <span>
+          Securely sign in with your Spotify account, then select the songs, playlists, albums, and artists you want to transfer.
+          Getoffify will create a personalized checklist with everything you need to finally make the switch.
+        </span>
       </div>
     </section>
   );
