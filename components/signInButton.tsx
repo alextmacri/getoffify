@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import getBaseUrl from "@/utils/getBaseUrl";
 import { Button } from "@heroui/button";
 import { button as buttonStyles } from "@heroui/theme";
 import { Modal, ModalContent, ModalHeader, ModalFooter } from "@heroui/modal";
@@ -19,7 +20,7 @@ export default function SignInButton({ username }: { username?: string }) {
     function confirmSignOut() {
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
-        window.location.href = "/";
+        window.location.href = getBaseUrl();
     }
 
     function cancelSignOut() {
