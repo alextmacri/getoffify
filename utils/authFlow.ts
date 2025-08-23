@@ -18,10 +18,10 @@ export async function authFlowUsername(spotifyAuthCode?: string): Promise<string
 
 
 async function getUsername(): Promise<string | undefined> {
-    const accessToken = localStorage.getItem("access_token");
-    if (accessToken) {
+    const token = localStorage.getItem("access_token");
+    if (token) {
         try {
-            const profile = await fetchProfile(accessToken);
+            const profile = await fetchProfile(token);
             if (profile.status === 200) {
                 return profile.body.display_name;
             }
