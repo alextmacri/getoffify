@@ -2,7 +2,7 @@
 // https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow
 
 import getBaseUrl from "@/utils/getBaseUrl";
-import request from "@/utils/request";
+import { request } from "@/utils/request";
 
 export async function redirectToAuthCodeFlow(clientId: string) {
     const codeVerifier = generateCodeVerifier(64);
@@ -15,7 +15,7 @@ export async function redirectToAuthCodeFlow(clientId: string) {
     const params =  {
         response_type: "code",
         client_id: clientId,
-        scope: "user-read-private user-read-email",
+        scope: "playlist-read-private playlist-read-collaborative user-library-read",
         code_challenge_method: "S256",
         code_challenge: codeChallenge,
         redirect_uri: getBaseUrl(),
