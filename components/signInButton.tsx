@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import getBaseUrl from "@/utils/getBaseUrl";
 import { Button } from "@heroui/button";
 import { button as buttonStyles } from "@heroui/theme";
 import { Modal, ModalContent, ModalHeader, ModalFooter } from "@heroui/modal";
 
 import { siteConfig } from "@/config/site";
 import { redirectToAuthCodeFlow } from "@/utils/spotifyAuth";
+import getBaseUrl from "@/utils/getBaseUrl";
 
 export default function SignInButton({ username }: { username?: string }) {
     const [hovered, setHovered] = useState(false);
