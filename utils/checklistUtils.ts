@@ -37,47 +37,54 @@ export type trackCollection = {
 
 export async function createChecklist() {
     const token = localStorage.getItem("access_token");
-        if (token) {
-            try {
-                // The saved tracks, albums, and artists can be fetched together
-                const savedTracks = await fetchAllPaginated(token, fetchSavedTracks, 50);
-                if (!savedTracks) throw new Error("Failed to fetch saved tracks");
-                const tracks = getTracksFromSavedTracks(savedTracks);
-                const albumIdNameMap = getAlbumIdNameMapFromSavedTracks(savedTracks);
-                const albumTracks = getAlbumTracks(savedTracks, albumIdNameMap);
-                const artistIdNameMap = getArtistIdNameMapFromSavedTracks(savedTracks);
-                const artistTracks = getArtistTracks(savedTracks, artistIdNameMap);
+    const userId = localStorage.getItem("spotify_user_id");
+    if (token) {
+        try {
+            // The saved tracks, albums, and artists can be fetched together
+            const savedTracks = await fetchAllPaginated(token, fetchSavedTracks, 50);
+            if (!savedTracks) throw new Error("Failed to fetch saved tracks");
+            const tracks = getTracksFromSavedTracks(savedTracks);
+            const albumIdNameMap = getAlbumIdNameMapFromSavedTracks(savedTracks);
+            const albumTracks = getAlbumTracks(savedTracks, albumIdNameMap);
+            const artistIdNameMap = getArtistIdNameMapFromSavedTracks(savedTracks);
+            const artistTracks = getArtistTracks(savedTracks, artistIdNameMap);
 
-                // The playlists and their tracks must be fetched on their own
-                const playlistIdNameMap = await getPlaylistIdNameMap(token);
-                const playlistTracks = await getPlaylistTracks(token, playlistIdNameMap);
+            // The playlists (user-created and saved) and their tracks must be fetched on their own
+            const { yourPlaylistIdNameMap, savedPlaylistIdNameMap } = await getPlaylistIdNameMap(token, userId || "");
+            const yourPlaylistTracks = await getPlaylistTracks(token, yourPlaylistIdNameMap);
+            const savedPlaylistTracks = await getPlaylistTracks(token, savedPlaylistIdNameMap);
 
-                // Saving the track and collection info to localStorage
-                saveObjectToLocalStorage("tracks", tracks);
-                saveObjectToLocalStorage("albumTracks", albumTracks);
-                saveObjectToLocalStorage("playlistTracks", playlistTracks);
-                saveObjectToLocalStorage("artistTracks", artistTracks);
+            // Saving the track and collection info to localStorage
+            saveObjectToLocalStorage("tracks", tracks);
+            saveObjectToLocalStorage("albumTracks", albumTracks);
+            saveObjectToLocalStorage("artistTracks", artistTracks);
+            saveObjectToLocalStorage("yourPlaylistTracks", yourPlaylistTracks);
+            saveObjectToLocalStorage("savedPlaylistTracks", savedPlaylistTracks);
 
-                // Generating the checklists, saving to localStorage
-                const trackChecklist = generateIdChecklistMap(tracks);
-                const playlistChecklist = generateIdCollectionChecklistMap(playlistTracks);
-                saveMapToLocalStorage("trackChecklist", trackChecklist);
-                saveMapToLocalStorage("playlistChecklist", playlistChecklist);
-                localStorage.setItem("hasChecklist", 'true');
-            } catch (error) {
-                console.error("Error fetching Spotify info:", error);
-            }
+            // Generating the checklists, saving to localStorage
+            const trackChecklist = generateIdChecklistMap(tracks);
+            const yourPlaylistChecklist = generateIdCollectionChecklistMap(yourPlaylistTracks);
+            const savedPlaylistChecklist = generateIdCollectionChecklistMap(savedPlaylistTracks);
+            saveMapToLocalStorage("trackChecklist", trackChecklist);
+            saveMapToLocalStorage("yourPlaylistChecklist", yourPlaylistChecklist);
+            saveMapToLocalStorage("savedPlaylistChecklist", savedPlaylistChecklist);
+            localStorage.setItem("hasChecklist", 'true');
+        } catch (error) {
+            console.error("Error fetching Spotify info:", error);
         }
+    }
 }
 
 
 export async function deleteChecklist() {
     removeFromLocalStorage("tracks");
     removeFromLocalStorage("albumTracks");
-    removeFromLocalStorage("playlistTracks");
     removeFromLocalStorage("artistTracks");
+    removeFromLocalStorage("yourPlaylistTracks");
+    removeFromLocalStorage("savedPlaylistTracks");
     removeFromLocalStorage("trackChecklist");
-    removeFromLocalStorage("playlistChecklist");
+    removeFromLocalStorage("yourPlaylistChecklist");
+    removeFromLocalStorage("savedPlaylistChecklist");
     localStorage.removeItem("hasChecklist")
 }
 
@@ -163,17 +170,23 @@ function getArtistTracks(savedTracks: APITrackObject[], artistIdNames: Map<strin
 }
 
 
-async function getPlaylistIdNameMap(token: string): Promise<Map<string, string>> {
+async function getPlaylistIdNameMap(token: string, userId: string): Promise<{yourPlaylistIdNameMap: Map<string, string>, savedPlaylistIdNameMap: Map<string, string>}> {
     const playlists = await fetchAllPaginated(token, fetchPlaylists, 50);
     if (!playlists) throw new Error("Failed to fetch playlists");
 
-    const playlistIdNames = new Map<string, string>();
-    playlists.forEach((playlist: { id: string; name: string; }) => {
-        if (playlist.id && playlist.name) {
-            playlistIdNames.set(playlist.id, playlist.name);
+    const yourPlaylistIdNameMap = new Map<string, string>();
+    const savedPlaylistIdNameMap = new Map<string, string>();
+    playlists.forEach((playlist: { id: string; name: string; owner: {id: string}; }) => {
+        if (playlist.id && playlist.name && playlist.owner && playlist.owner.id) {
+            // playlistIdNames.set(playlist.id, playlist.name);
+            if (playlist.owner.id === userId) {
+                yourPlaylistIdNameMap.set(playlist.id, playlist.name);
+            } else {
+                savedPlaylistIdNameMap.set(playlist.id, playlist.name);
+            }
         }
     });
-    return playlistIdNames;
+    return {yourPlaylistIdNameMap, savedPlaylistIdNameMap};
 }
 
 
@@ -197,7 +210,7 @@ async function getPlaylistTracks(token: string, playlistIdNames: Map<string, str
 function generateIdChecklistMap(items: { id: string }[]): Map<string, boolean> {
     const idNameMap = new Map<string, boolean>();
     items.forEach((item) => {
-        if (item.id) {
+        if (item && item.id) {
             idNameMap.set(item.id, false);
         }
     });
@@ -208,7 +221,7 @@ function generateIdChecklistMap(items: { id: string }[]): Map<string, boolean> {
 function generateIdCollectionChecklistMap(items: trackCollection[]): Map<string, Map<string, boolean>> {
     const idCollectionMap = new Map<string, Map<string, boolean>>();
     items.forEach((item) => {
-        if (item.id) {
+        if (item.id && item.songs) {
             idCollectionMap.set(item.id, generateIdChecklistMap(item.songs));
         }
     });
