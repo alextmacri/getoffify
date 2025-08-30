@@ -8,22 +8,29 @@ export async function authFlowUsername(spotifyAuthCode?: string): Promise<string
         await getAccessToken(siteConfig.clientId, spotifyAuthCode);
         localStorage.setItem("auth_code_unused", "false");
     }
-    const username = await getUsername();
-    if (username) {
-        return username;
+    let userInfo = await getUserInfo();
+    if (userInfo && userInfo.username) {
+        localStorage.setItem("spotify_user_id", userInfo.userId);
+        return userInfo.username;
     }
+
+    // If that didn't work, refresh the token and try again 
     await refreshAccessToken(siteConfig.clientId);
-    return await getUsername();
+    userInfo = await getUserInfo();
+    if (userInfo && userInfo.username) {
+        localStorage.setItem("spotify_user_id", userInfo.userId);
+        return userInfo.username;
+    }
 }
 
 
-async function getUsername(): Promise<string | undefined> {
+async function getUserInfo(): Promise<{ username: string, userId: string } | undefined> {
     const token = localStorage.getItem("access_token");
     if (token) {
         try {
             const profile = await fetchProfile(token);
             if (profile.status === 200) {
-                return profile.body.display_name;
+                return {username: profile.body.display_name, userId: profile.body.id};
             }
         } catch (error) {
             console.error("Error fetching Spotify profile:", error);

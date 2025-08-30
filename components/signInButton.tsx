@@ -20,6 +20,7 @@ export default function SignInButton({ username }: { username?: string }) {
     function confirmSignOut() {
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
+        localStorage.removeItem("spotify_user_id");
         window.location.href = getBaseUrl();
     }
 
