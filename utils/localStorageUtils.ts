@@ -16,19 +16,36 @@ export function loadObjectFromLocalStorage(key: string): any | undefined {
 
 
 export function saveMapToLocalStorage(key: string, map: Map<any, any>): void {
-    const mapAsArray = Array.from(map.entries());   // Convert the Map to an array of [key, value] pairs
-    const jsonString = JSON.stringify(mapAsArray);  // Stringify the array to JSON
-    localStorage.setItem(key, jsonString);
+    let obj: Record<string, any> = {};
+
+    for (let [k, v] of map.entries()) {
+        if (v instanceof Map) {
+            obj[k] = Object.fromEntries(v.entries());
+        } else {
+            obj[k] = v;
+        }
+    }
+
+    localStorage.setItem(key, JSON.stringify(obj));
 }
 
 
 export function loadMapFromLocalStorage(key: string): Map<any, any> | undefined {
     const jsonString = localStorage.getItem(key);
     if (jsonString) {
-        const mapAsArray = JSON.parse(jsonString);  // Parse the JSON string back into an array of [key, value] pairs
-        return new Map(mapAsArray);                 // Convert the array back into a Map
+        const obj = JSON.parse(jsonString) as Record<string, any>;
+
+        const isNested = Object.values(obj).some(value => value instanceof Object && value !== null && typeof value !== "boolean");
+
+        if (isNested) {
+            const outerMap = new Map<string, Map<any, any>>();
+            for (let outerKey in obj) {
+                outerMap.set(outerKey, new Map(Object.entries(obj[outerKey])));
+            }
+            return outerMap;
+        }
+        return new Map(Object.entries(obj));
     }
-    return;
 }
 
 
