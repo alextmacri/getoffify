@@ -55,8 +55,8 @@ export default function Home() {
     <>
       <TitleText />
       {isLoading ? <Spinner color="current" /> : (username ? <SignInButton username={username} /> : <SignInButton />)}
-      {!isLoading && (hasChecklist ? <Checklist /> : (username ? <CreateChecklistButton checklistCreateFunc={checklistCreateFunc} /> : <InfoText />))}
-      {!isLoading && hasChecklist && <DeleteChecklistButton checklistDeleteFunc={checklistDeleteFunc} />}
+      {hasChecklist ? <Checklist /> : (username ? <CreateChecklistButton checklistCreateFunc={checklistCreateFunc} /> : <InfoText />)}
+      {hasChecklist && <DeleteChecklistButton checklistDeleteFunc={checklistDeleteFunc} />}
     </>
   );
 }
