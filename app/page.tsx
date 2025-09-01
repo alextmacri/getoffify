@@ -16,6 +16,7 @@ import { createChecklist, deleteChecklist } from "@/utils/checklistUtils";
 
 export default function Home() {
   const [isLoading, setLoading] = useState(true);
+  const [isCreatingChecklist, setCreatingChecklist] = useState(false);
   const [username, setUsername] = useState<string | undefined>(undefined);
   const [hasChecklist, setHasChecklist] = useState(false);
   const params = useSearchParams();
@@ -27,6 +28,7 @@ export default function Home() {
 
   const checklistCreateFunc = async () => {
     setLoading(true);
+    setCreatingChecklist(true);
     try {
       await createChecklist();
       loadTrackInfo();
@@ -34,6 +36,7 @@ export default function Home() {
       console.error("Error creating checklist:", error);
     } finally {
       setLoading(false);
+      setCreatingChecklist(false);
     }
   }
 
